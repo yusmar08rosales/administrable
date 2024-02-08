@@ -18,6 +18,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const UserView = () => {
+
   const navigate = useNavigate();
   const location = useLocation();
   const { setUser } = useAuth();
@@ -97,14 +98,22 @@ const UserView = () => {
   }, [usuarioSeleccionado, nameProduct]);
 
   //actualizar lista de usuarios en tiempo real
+  useEffect(() => {
+    const actualizarUsuarios = async () => {
+      obtenerUsuarios(nameProduct, 1, searchTerm);
+    };
+  
+    const intervalo = setInterval(actualizarUsuarios, 3000);
+  
+    return () => {
+      clearInterval(intervalo)
+    };
+  }, [nameProduct, searchTerm, selectedDate]); 
 
   //obtener los numeros de telefono
-  const obtenerUsuarios = async (
-    name_product,
-    page,
-    searchTerm,
-    selectedDate
-  ) => {
+  const obtenerUsuarios = async (name_product, page, searchTerm, selectedDate) => {
+    //console.log('testing');
+    //console.log(name_product+' '+page+' '+searchTerm+' '+selectedDate);
     try {
       const response = await fetch("http://localhost:3000/obtenerNumeros", {
         method: "POST",
@@ -127,7 +136,7 @@ const UserView = () => {
       if (nuevosUsuarios.length < 10) {
         setHayMasUsuarios(false);
       }
-      console.log("carga..: ", nuevosUsuarios);
+      //console.log("carga..: ", nuevosUsuarios);
       setUsuarios((prev) =>
         page === 1 ? nuevosUsuarios : [...prev, ...nuevosUsuarios]
       );
@@ -248,10 +257,10 @@ const UserView = () => {
     }
   }, [searchTerm]);
 
-  //scroll
+  //scroll de mensajes
   useEffect(() => {
     if (vistaChatboxRef.current) {
-      console.log('valor de scroll: ', resultados.statusScroll);
+      //console.log('valor de scroll: ', resultados.statusScroll);
       if(!resultados.statusScroll) {
         requestAnimationFrame(() => {
           vistaChatboxRef.current.scrollTop = vistaChatboxRef.current.scrollHeight;
@@ -265,43 +274,42 @@ const UserView = () => {
     // Esta función se llama después de cada actualización de los mensajes.
     const ajustarScrollDespuesDeCargarMensajes = () => {
       if (!usuarioSeleccionado) {
-        // Si no hay un usuario seleccionado (carga inicial), mueve el scroll al final.
         vistaChatboxRef.current.scrollTop = vistaChatboxRef.current.scrollHeight;
       } else {
-        // Si hay un usuario seleccionado y el usuario estaba al final, mantenlo allí.
-        // De lo contrario, no ajustes el scroll.
         const estabaAlFinal = vistaChatboxRef.current.scrollHeight - vistaChatboxRef.current.clientHeight <= vistaChatboxRef.current.scrollTop + 1;
         if (estabaAlFinal) {
           vistaChatboxRef.current.scrollTop = vistaChatboxRef.current.scrollHeight;
         }
       }
     };
-  
     ajustarScrollDespuesDeCargarMensajes();
   }, [resultados]);
   
   
-  // Efecto para manejar la paginación infinita
+  //scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hayMasUsuarios) {
-          setPaginaActual((prevPage) => prevPage + 1);
+          console.log("Cargar más usuarios");
+          setPaginaActual(prevPage => prevPage + 1);
         }
       },
-      { threshold: 1.0 }
+      { threshold: 0.5 } 
     );
-
+  
     if (bottomRef.current) {
       observer.observe(bottomRef.current);
     }
-
+  
     return () => {
       if (bottomRef.current) {
         observer.unobserve(bottomRef.current);
       }
     };
   }, [hayMasUsuarios, bottomRef.current]);
+  
+  
 
   //paginado
   useEffect(() => {
@@ -374,7 +382,8 @@ const UserView = () => {
                 )}
               </div>
             </div>
-            <div className="chatlist">
+            
+            <div className="chatlist" /*ref={bottomRef}*/>
               {usuarios.map((usuario, index) => (
                 <div
                   className={`block ${
@@ -487,7 +496,6 @@ const UserView = () => {
                         )}
                       </div>
                     ))}
-                  <div ref={bottomRef}></div>
                 </React.Fragment>
               ))}
             </div>
