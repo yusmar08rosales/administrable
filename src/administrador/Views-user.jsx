@@ -18,14 +18,15 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const UserView = () => {
-
   const navigate = useNavigate();
   const location = useLocation();
   const { setUser } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
+  const [nombreUsuarioSeleccionado, setNombreUsuarioSeleccionado] = useState("");
+  const[chanchitofeliz, setChanchitofeliz]= useState({});
   const [resultados, setResultados] = useState({
     statusScroll: false,
-    data: []
+    data: [],
   });
   const [llamada, setLlamada] = useState(false);
   const [nameProduct, setNameProduct] = useState("");
@@ -38,6 +39,7 @@ const UserView = () => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
+  const [totalSuscriptores, setTotalSuscriptores] = useState(0);
   const vistaChatboxRef = useRef(null);
   //estado de scroll por usuario
 
@@ -82,6 +84,31 @@ const UserView = () => {
     setIsDatePickerVisible(!isDatePickerVisible);
   };
 
+  // Obtener total de suscriptores
+  useEffect(() => {
+    const obtenerTotalSuscriptores = async () => {
+      if (!nameProduct) return; // Asegúrate de que nameProduct esté definido
+
+      try {
+        const url = `http://localhost:3000/obtenerTotalSuscriptores?name_product=${encodeURIComponent(
+          nameProduct
+        )}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error("Error al obtener el total de suscriptores");
+        }
+
+        const { totalSuscriptores } = await response.json();
+        setTotalSuscriptores(totalSuscriptores); // Actualiza el estado con el total obtenido
+      } catch (error) {
+        console.error("Error al obtener total de suscriptores:", error);
+      }
+    };
+
+    obtenerTotalSuscriptores();
+  }, [nameProduct]);
+
   //actualizar lista de mensajes en tiempo real
   useEffect(() => {
     const verificarYActualizarMensajes = async () => {
@@ -98,22 +125,14 @@ const UserView = () => {
   }, [usuarioSeleccionado, nameProduct]);
 
   //actualizar lista de usuarios en tiempo real
-  useEffect(() => {
-    const actualizarUsuarios = async () => {
-      obtenerUsuarios(nameProduct, 1, searchTerm);
-    };
-  
-    const intervalo = setInterval(actualizarUsuarios, 3000);
-  
-    return () => {
-      clearInterval(intervalo)
-    };
-  }, [nameProduct, searchTerm, selectedDate]); 
 
   //obtener los numeros de telefono
-  const obtenerUsuarios = async (name_product, page, searchTerm, selectedDate) => {
-    //console.log('testing');
-    //console.log(name_product+' '+page+' '+searchTerm+' '+selectedDate);
+  const obtenerUsuarios = async (
+    name_product,
+    page,
+    searchTerm,
+    selectedDate
+  ) => {
     try {
       const response = await fetch("http://localhost:3000/obtenerNumeros", {
         method: "POST",
@@ -132,11 +151,14 @@ const UserView = () => {
         throw new Error("Error al obtener los datos");
       }
       const nuevosUsuarios = await response.json();
-      nuevosUsuarios.sort((a, b) => new Date(b.ultimoMensajeFecha) - new Date(a.ultimoMensajeFecha));
+      nuevosUsuarios.sort(
+        (a, b) =>
+          new Date(b.ultimoMensajeFecha) - new Date(a.ultimoMensajeFecha)
+      );
       if (nuevosUsuarios.length < 10) {
         setHayMasUsuarios(false);
       }
-      //console.log("carga..: ", nuevosUsuarios);
+      console.log("carga..: ", nuevosUsuarios);
       setUsuarios((prev) =>
         page === 1 ? nuevosUsuarios : [...prev, ...nuevosUsuarios]
       );
@@ -170,10 +192,15 @@ const UserView = () => {
         throw new Error("Error al obtener los datos");
       }
       const data = await response.json();
+      console.log("data: ", data);
       setResultados({
         statusScroll: true,
-        data: data
+        data: data.mensajes,
+        nombreUsuario: data.nombreUsuario,
+        
       });
+      /*console.log("NOMBRE TES: ", nombreUsuario);
+      setNombreUsuarioSeleccionado(nombreUsuario);*/
     } catch (error) {
       console.error(error);
     }
@@ -194,43 +221,47 @@ const UserView = () => {
         throw new Error("Error al obtener los datos");
       }
       const data = await response.json();
+      console.log("data2", data);
       setResultados({
         statusScroll: false,
-        data: data
+        data: data.mensajes,
+        nombreUsuario: data.nombreUsuario,
       });
     } catch (error) {
       console.error(error);
     }
   };
 
-  const mostrarFecha = (fecha, index,) => {
+  const mostrarFecha = (fecha, index) => {
     return index === 0 ? <div className="fecha-flotante">{fecha}</div> : null;
   };
 
   const marcarTodosComoLeidos = async () => {
     try {
-        const response = await fetch('http://localhost:3000/marcarTodosComoLeidos', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name_product: nameProduct }),
-        });
-
-        if (!response.ok) {
-            throw new Error('No se pudo marcar los mensajes como leídos');
+      const response = await fetch(
+        "http://localhost:3000/marcarTodosComoLeidos",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name_product: nameProduct }),
         }
+      );
 
-        const data = await response.json();
-        console.log(data.message);
+      if (!response.ok) {
+        throw new Error("No se pudo marcar los mensajes como leídos");
+      }
 
-        // Opcional: Actualiza la UI si es necesario, por ejemplo, recargando los usuarios/mensajes
-        obtenerUsuarios(nameProduct, paginaActual, searchTerm, selectedDate);
+      const data = await response.json();
+      console.log(data.message);
+
+      // Opcional: Actualiza la UI si es necesario, por ejemplo, recargando los usuarios/mensajes
+      obtenerUsuarios(nameProduct, paginaActual, searchTerm, selectedDate);
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-};
-
+  };
 
   //Obtener nombre del producto seleccionado.
   useEffect(() => {
@@ -257,15 +288,15 @@ const UserView = () => {
     }
   }, [searchTerm]);
 
-  //scroll de mensajes
+  //scroll
   useEffect(() => {
     if (vistaChatboxRef.current) {
-      //console.log('valor de scroll: ', resultados.statusScroll);
-      if(!resultados.statusScroll) {
+      console.log("valor de scroll: ", resultados.statusScroll);
+      if (!resultados.statusScroll) {
         requestAnimationFrame(() => {
-          vistaChatboxRef.current.scrollTop = vistaChatboxRef.current.scrollHeight;
+          vistaChatboxRef.current.scrollTop =
+            vistaChatboxRef.current.scrollHeight;
         });
-
       }
     }
   }, [resultados]);
@@ -274,42 +305,47 @@ const UserView = () => {
     // Esta función se llama después de cada actualización de los mensajes.
     const ajustarScrollDespuesDeCargarMensajes = () => {
       if (!usuarioSeleccionado) {
-        vistaChatboxRef.current.scrollTop = vistaChatboxRef.current.scrollHeight;
+        // Si no hay un usuario seleccionado (carga inicial), mueve el scroll al final.
+        vistaChatboxRef.current.scrollTop =
+          vistaChatboxRef.current.scrollHeight;
       } else {
-        const estabaAlFinal = vistaChatboxRef.current.scrollHeight - vistaChatboxRef.current.clientHeight <= vistaChatboxRef.current.scrollTop + 1;
+        // Si hay un usuario seleccionado y el usuario estaba al final, mantenlo allí.
+        // De lo contrario, no ajustes el scroll.
+        const estabaAlFinal =
+          vistaChatboxRef.current.scrollHeight -
+            vistaChatboxRef.current.clientHeight <=
+          vistaChatboxRef.current.scrollTop + 1;
         if (estabaAlFinal) {
-          vistaChatboxRef.current.scrollTop = vistaChatboxRef.current.scrollHeight;
+          vistaChatboxRef.current.scrollTop =
+            vistaChatboxRef.current.scrollHeight;
         }
       }
     };
+
     ajustarScrollDespuesDeCargarMensajes();
   }, [resultados]);
-  
-  
-  //scroll
+
+  // Efecto para manejar la paginación infinita
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hayMasUsuarios) {
-          console.log("Cargar más usuarios");
-          setPaginaActual(prevPage => prevPage + 1);
+          setPaginaActual((prevPage) => prevPage + 1);
         }
       },
-      { threshold: 0.5 } 
+      { threshold: 1.0 }
     );
-  
+
     if (bottomRef.current) {
       observer.observe(bottomRef.current);
     }
-  
+
     return () => {
       if (bottomRef.current) {
         observer.unobserve(bottomRef.current);
       }
     };
   }, [hayMasUsuarios, bottomRef.current]);
-  
-  
 
   //paginado
   useEffect(() => {
@@ -323,6 +359,8 @@ const UserView = () => {
     setLlamada(false);
   }, [usuarios]);
 
+
+  console.log("resultados", resultados);
 
   return (
     <>
@@ -351,6 +389,9 @@ const UserView = () => {
           <div className="leftSide">
             <div className="header">
               <ul className="nav_icons">{nameProduct}</ul>
+              <div className="total-suscriptores">
+                <p>Total: {totalSuscriptores}</p>
+              </div>
               <Button onClick={marcarTodosComoLeidos}>
                 <ul className="marcar-no-leidos">O</ul>
               </Button>
@@ -382,8 +423,7 @@ const UserView = () => {
                 )}
               </div>
             </div>
-            
-            <div className="chatlist" /*ref={bottomRef}*/>
+            <div className="chatlist" ref={bottomRef}>
               {usuarios.map((usuario, index) => (
                 <div
                   className={`block ${
@@ -421,7 +461,7 @@ const UserView = () => {
                   </Button>
                 </div>
               ))}
-              <div ref={bottomRef}></div>
+              <div /*ref={bottomRef}*/></div>
             </div>
           </div>
 
@@ -442,7 +482,7 @@ const UserView = () => {
                     ? usuarioSeleccionado
                     : "Sin Seleccionar"}
                   <br />
-                  <span>name</span>
+                    <span>{resultados.nombreUsuario}</span>
                 </h4>
               </div>
               <ul className="nav_icons">
