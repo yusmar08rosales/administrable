@@ -125,6 +125,17 @@ const UserView = () => {
   }, [usuarioSeleccionado, nameProduct]);
 
   //actualizar lista de usuarios en tiempo real
+  useEffect(() => {
+    const actualizarUsuarios = async () => {
+      obtenerUsuarios(nameProduct, 1, searchTerm);
+    };
+  
+    const intervalo = setInterval(actualizarUsuarios, 3000);
+  
+    return () => {
+      clearInterval(intervalo)
+    };
+  }, [nameProduct, searchTerm, selectedDate]); 
 
   //obtener los numeros de telefono
   const obtenerUsuarios = async (
