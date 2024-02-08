@@ -275,6 +275,7 @@ const UserView = () => {
   };
 
   //Obtener nombre del producto seleccionado.
+  
   useEffect(() => {
     if (location.state && location.state.name_product && !llamada) {
       const name_product = location.state.name_product;
