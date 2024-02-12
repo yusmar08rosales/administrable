@@ -6,12 +6,16 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 
+// Componente ToggleBotButton
+import ToggleBotButton from "./ToggleBotButton";
+
 //iconos
 import SearchIcon from "@mui/icons-material/Search";
 import LogoutIcon from "@mui/icons-material/Logout";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { Button } from "@mui/material";
+import MarkChatReadIcon from "@mui/icons-material/MarkChatRead";
 
 //icono calendario calendario
 import DatePicker from "react-datepicker";
@@ -22,8 +26,6 @@ const UserView = () => {
   const location = useLocation();
   const { setUser } = useAuth();
   const [usuarios, setUsuarios] = useState([]);
-  const [nombreUsuarioSeleccionado, setNombreUsuarioSeleccionado] = useState("");
-  const[chanchitofeliz, setChanchitofeliz]= useState({});
   const [resultados, setResultados] = useState({
     statusScroll: false,
     data: [],
@@ -61,10 +63,10 @@ const UserView = () => {
   };
 
   // Función para manejar la selección de fecha
-  const handleDateChange = (formattedDate) => {
-    setSelectedDate(formattedDate);
+  const handleDateChange = (selectedDate) => {
+    setSelectedDate(selectedDate);
     setIsDatePickerVisible(false);
-    obtenerUsuarios(nameProduct, 1, searchTerm, formattedDate.toISOString());
+    obtenerUsuarios(nameProduct, 1, searchTerm, selectedDate.toISOString());
   };
 
   //normalice el texto y no impora si tiene caracteres especiales
@@ -129,13 +131,13 @@ const UserView = () => {
     const actualizarUsuarios = async () => {
       obtenerUsuarios(nameProduct, 1, searchTerm);
     };
-  
+
     const intervalo = setInterval(actualizarUsuarios, 3000);
-  
+
     return () => {
-      clearInterval(intervalo)
+      clearInterval(intervalo);
     };
-  }, [nameProduct, searchTerm, selectedDate]); 
+  }, [nameProduct, searchTerm]);
 
   //obtener los numeros de telefono
   const obtenerUsuarios = async (
@@ -168,10 +170,12 @@ const UserView = () => {
       );
       if (nuevosUsuarios.length < 10) {
         setHayMasUsuarios(false);
+      } else {
+        setHayMasUsuarios(true);
       }
       console.log("carga..: ", nuevosUsuarios);
-      setUsuarios((prev) =>
-        page === 1 ? nuevosUsuarios : [...prev, ...nuevosUsuarios]
+      setUsuarios((prevUsuarios) =>
+        page === 1 ? nuevosUsuarios : [...prevUsuarios, ...nuevosUsuarios]
       );
     } catch (error) {
       console.error(error);
@@ -203,15 +207,11 @@ const UserView = () => {
         throw new Error("Error al obtener los datos");
       }
       const data = await response.json();
-      console.log("data: ", data);
       setResultados({
         statusScroll: true,
         data: data.mensajes,
         nombreUsuario: data.nombreUsuario,
-        
       });
-      /*console.log("NOMBRE TES: ", nombreUsuario);
-      setNombreUsuarioSeleccionado(nombreUsuario);*/
     } catch (error) {
       console.error(error);
     }
@@ -232,7 +232,6 @@ const UserView = () => {
         throw new Error("Error al obtener los datos");
       }
       const data = await response.json();
-      console.log("data2", data);
       setResultados({
         statusScroll: false,
         data: data.mensajes,
@@ -265,8 +264,7 @@ const UserView = () => {
       }
 
       const data = await response.json();
-      console.log(data.message);
-
+      console.log(data);
       // Opcional: Actualiza la UI si es necesario, por ejemplo, recargando los usuarios/mensajes
       obtenerUsuarios(nameProduct, paginaActual, searchTerm, selectedDate);
     } catch (error) {
@@ -275,7 +273,7 @@ const UserView = () => {
   };
 
   //Obtener nombre del producto seleccionado.
-  
+
   useEffect(() => {
     if (location.state && location.state.name_product && !llamada) {
       const name_product = location.state.name_product;
@@ -303,7 +301,6 @@ const UserView = () => {
   //scroll
   useEffect(() => {
     if (vistaChatboxRef.current) {
-      console.log("valor de scroll: ", resultados.statusScroll);
       if (!resultados.statusScroll) {
         requestAnimationFrame(() => {
           vistaChatboxRef.current.scrollTop =
@@ -314,15 +311,11 @@ const UserView = () => {
   }, [resultados]);
 
   useEffect(() => {
-    // Esta función se llama después de cada actualización de los mensajes.
     const ajustarScrollDespuesDeCargarMensajes = () => {
       if (!usuarioSeleccionado) {
-        // Si no hay un usuario seleccionado (carga inicial), mueve el scroll al final.
         vistaChatboxRef.current.scrollTop =
           vistaChatboxRef.current.scrollHeight;
       } else {
-        // Si hay un usuario seleccionado y el usuario estaba al final, mantenlo allí.
-        // De lo contrario, no ajustes el scroll.
         const estabaAlFinal =
           vistaChatboxRef.current.scrollHeight -
             vistaChatboxRef.current.clientHeight <=
@@ -341,6 +334,7 @@ const UserView = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
+        // Verifica si el elemento observado está intersectando
         if (entries[0].isIntersecting && hayMasUsuarios) {
           setPaginaActual((prevPage) => prevPage + 1);
         }
@@ -348,16 +342,18 @@ const UserView = () => {
       { threshold: 1.0 }
     );
 
+    // Si existe el elemento a observar, entonces observarlo
     if (bottomRef.current) {
       observer.observe(bottomRef.current);
     }
 
+    // Limpiar el observer al desmontar el componente
     return () => {
       if (bottomRef.current) {
         observer.unobserve(bottomRef.current);
       }
     };
-  }, [hayMasUsuarios, bottomRef.current]);
+  }, [hayMasUsuarios, bottomRef.current]); // Asegúrate de incluir todas las dependencias necesarias
 
   //paginado
   useEffect(() => {
@@ -370,9 +366,6 @@ const UserView = () => {
   useEffect(() => {
     setLlamada(false);
   }, [usuarios]);
-
-
-  console.log("resultados", resultados);
 
   return (
     <>
@@ -405,7 +398,7 @@ const UserView = () => {
                 <p>Total: {totalSuscriptores}</p>
               </div>
               <Button onClick={marcarTodosComoLeidos}>
-                <ul className="marcar-no-leidos">O</ul>
+                <MarkChatReadIcon className="marcar-no-leidos" />
               </Button>
             </div>
             <div className="search_chat">
@@ -420,8 +413,8 @@ const UserView = () => {
                 </ion-icon>
               </div>
               <div className="filter">
-                <Button onClick={toggleDatePicker}>
-                  <CalendarMonthIcon />
+                <Button className="calendary" onClick={toggleDatePicker}>
+                  <CalendarMonthIcon className="marcar-no-leidos" />
                 </Button>
                 {isDatePickerVisible && (
                   <div className="datepicker-container">
@@ -435,7 +428,7 @@ const UserView = () => {
                 )}
               </div>
             </div>
-            <div className="chatlist" ref={bottomRef}>
+            <div className="chatlist">
               {usuarios.map((usuario, index) => (
                 <div
                   className={`block ${
@@ -473,7 +466,7 @@ const UserView = () => {
                   </Button>
                 </div>
               ))}
-              <div /*ref={bottomRef}*/></div>
+              <div ref={bottomRef}></div>
             </div>
           </div>
 
@@ -494,8 +487,12 @@ const UserView = () => {
                     ? usuarioSeleccionado
                     : "Sin Seleccionar"}
                   <br />
-                    <span>{resultados.nombreUsuario}</span>
+                  <span>{resultados.nombreUsuario}</span>
                 </h4>
+                <ToggleBotButton
+                  userId={usuarioSeleccionado}
+                  productName={nameProduct}
+                />
               </div>
               <ul className="nav_icons">
                 <li onClick={toggleSearchBar}>

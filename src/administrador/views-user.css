@@ -10,7 +10,11 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-  }*/
+}*/
+
+.button-product {
+  text-align: justify;
+}
 
 .container {
   position: relative;
@@ -171,7 +175,7 @@
 }
 
 .buscador {
-  width: 90%;
+  width: 87.5%;
 }
 
 .search_chat div input {
@@ -201,7 +205,7 @@
   position: absolute;
   z-index: 100;
   top: 0px;
-  left: 470px;
+  left: 100%;
   overflow: auto;
 }
 
@@ -280,6 +284,7 @@
   width: 100%;
   border: none;
   background: #111;
+  text-align: justify;
 }
 
 .button-back {
@@ -314,7 +319,12 @@
 }
 
 .marcar-no-leidos {
-  color: #06d755;
+  /*color: #06d755;*/
+  color: #15394f;
+}
+
+.calendary {
+  margin: 1%;
 }
 
 .message_p p {
@@ -508,4 +518,21 @@
   outline: none;
   border-radius: 30px;
   font-size: 1em;
+}
+
+.whatsappInputs{
+  display: flex;
+  align-items: baseline;
+}
+
+.codigo{
+  width: 25%;
+}
+
+.numero{
+  width: 80%;
+}
+
+.icono{
+  right: 0;
 }

@@ -1,7 +1,7 @@
 import './App.scss'
 import React, { useState } from 'react';
 import { Button, TextField } from '@mui/material';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from './auth/AuthContext'
 import axios from 'axios';
 
@@ -108,9 +108,6 @@ function App() {
                 value={values.password}
                 onChange={handleChange}
               />
-              <Link to={'/user/registro'}>
-                Registrar
-              </Link>
             </form>
           </main>
 

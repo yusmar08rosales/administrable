@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
+import './views-user.css'
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -20,6 +21,8 @@ import { Button } from '@mui/material';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const views = () => {
     const navigate = useNavigate();
@@ -109,6 +112,16 @@ const views = () => {
         navigate('/user/usuario', { state: { name_product: name_product } });
     };
 
+    const handleProducto = async () => {
+        console.log("registrar producto");
+        navigate('/user/administrador/ingresa');
+    };
+
+    const handleCliente = async () => {
+        console.log("registrar usuario");
+        navigate('/user/administrador/registro');
+    };
+
     //cuadro que muestra la actividad si es prompt o asistente 
     const renderDialog = () => (
         <Dialog
@@ -116,7 +129,7 @@ const views = () => {
             onClose={handleCloseDialog}
             className='cuadro'
             fullWidth={true}
-            maxWidth="md" 
+            maxWidth="md"
         >
             <h4
                 className='title'
@@ -124,11 +137,11 @@ const views = () => {
                 {promptUpdat}
             </h4>
             <Button>
-            {(promptUpdat === 'MARCUSS CORPORATIVE' || promptUpdat === 'BOT ASISTENTE PRUEBAS EDUARDO') && (
-                <a href="https://platform.openai.com/assistants" target="_blank" rel="noopener noreferrer" className='linkAsis'>
-                    Ir al asistente
-                </a>
-            )}
+                {(promptUpdat === 'MARCUSS CORPORATIVE' || promptUpdat === 'BOT ASISTENTE PRUEBAS EDUARDO') && (
+                    <a href="https://platform.openai.com/assistants" target="_blank" rel="noopener noreferrer" className='linkAsis'>
+                        Ir al asistente
+                    </a>
+                )}
             </Button>
             <DialogContent>
                 <textarea
@@ -157,14 +170,16 @@ const views = () => {
             </div>
             <AppBar position="static" sx={{ backgroundColor: '#128C7E' }}>
                 <Toolbar>
-                    <IconButton
-                        edge="end"
-                        color="inherit"
-                        aria-label="logout"
-                        onClick={handleLogout}
-                    >
+                    <Button color="inherit" onClick={handleLogout}>
                         <LogoutIcon />
-                    </IconButton>
+                    </Button>
+                    <div style={{ flexGrow: 1 }}></div>
+                    <Button color="inherit" onClick={handleProducto}>
+                        <PlaylistAddIcon />
+                    </Button>
+                    <Button color="inherit" onClick={handleCliente} className='icono'>
+                        <PersonAddIcon />
+                    </Button>
                 </Toolbar>
             </AppBar>
 
@@ -178,6 +193,7 @@ const views = () => {
                             <TableCell>Actividad</TableCell>
                             <TableCell>Descripción</TableCell>
                             <TableCell>Estado</TableCell>
+                            <TableCell>Métricas</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -186,7 +202,7 @@ const views = () => {
                                 key={uuidv4()}
                             >
                                 <TableCell>
-                                    <Button onClick={() => handleProductClick(product.name_product)}>
+                                    <Button className="button-product" onClick={() => handleProductClick(product.name_product)}>
                                         {product.name_product}
                                     </Button>
                                 </TableCell>

@@ -11,6 +11,7 @@ import App from './App';
 import Modal from './registro/Modal';
 import Views from './administrador/views';
 import UserView from './administrador/Views-user';
+import Ingresa from './administrador/ingresar';
 
 import { AuthProvider } from './auth/AuthContext';
 import ProtectedRoute from './route/ProtectedRouter';
@@ -21,7 +22,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 			<BrowserRouter>
 				<Routes>
 					<Route path='/user' element={<App />} />
-					<Route path='/user/registro' element={<Modal />} />
+					
 					{/* Rutas para roles */}
 					{/* ... otras rutas ... */}
 					<Route path='/user/administrador' element={
@@ -29,6 +30,18 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 							<Views />
 						</ProtectedRoute>
 					} />
+
+					<Route path='/user/administrador/registro' element={
+						<ProtectedRoute roles={['user', 'admin']}>
+							<Modal />
+						</ProtectedRoute>
+					} />
+					<Route path='/user/administrador/ingresa' element={
+						<ProtectedRoute roles={['user', 'admin']}>
+							<Ingresa />
+						</ProtectedRoute>
+					} />
+
 					<Route path='/user/usuario' element={
 						<ProtectedRoute roles={['user', 'admin']}>
 							<UserView />
