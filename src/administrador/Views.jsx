@@ -177,7 +177,7 @@ const views = () => {
                     <Button color="inherit" onClick={handleProducto}>
                         <PlaylistAddIcon />
                     </Button>
-                    <Button color="inherit" onClick={handleCliente} className='icono'>
+                    <Button color="inherit" onClick={handleCliente}>
                         <PersonAddIcon />
                     </Button>
                 </Toolbar>

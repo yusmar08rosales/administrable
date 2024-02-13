@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
+import "./views-user.css";
 
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
+import { colors } from "@mui/material";
 
 const ToggleBotButton = ({ userId, productName }) => {
-  const [isActive, setIsActive] = useState(null);
+  const [isActive, setIsActive] = useState(false);
+  const [isProductAllowed, setIsProductAllowed] = useState(true);
+
 
   useEffect(() => {
 
-    if (!userId || !productName || productName === "MARCUSS TRANSCRIPTOR" || productName === "MARCUSS PREMIUM") {
-      setIsActive(null); // Si el producto no debe mostrar el switch, mantenemos isActive como null.
-      return;
+     // Verifica si el producto no debe mostrar el switch
+     if (productName === "MARCUSS TRANSCRIPTOR" || productName === "MARCUSS PREMIUM") {
+      setIsProductAllowed(false);
+      return; // Detiene la ejecución adicional si el producto no está permitido
     }
 
     // Cargar el estado inicial del botón al montar el componente y cuando cambien userId o productName
@@ -58,7 +63,11 @@ const ToggleBotButton = ({ userId, productName }) => {
   };
 
   // Si el producto es MARCUSS TRANSCRIPTOR o MARCUSS PREMIUM, no renderizar el componente
-  if (productName === "MARCUSS TRANSCRIPTOR" || productName === "MARCUSS PREMIUM") {
+  /*if (productName === "MARCUSS TRANSCRIPTOR" || productName === "MARCUSS PREMIUM") {
+    return null;
+  }*/
+
+  if (!isProductAllowed) {
     return null;
   }
 
@@ -68,11 +77,13 @@ const ToggleBotButton = ({ userId, productName }) => {
         <FormControlLabel
           control={
             <Switch
-              checked={isActive} // Usa el estado `isActive` para controlar el componente
-              onChange={toggleBotStatus} // Maneja el cambio cuando el usuario interactúa con el switch
+              checked={isActive} 
+              onChange={toggleBotStatus} 
+              className={`switch-margin ${isActive ? "switch-active" : ""}`}
             />
           }
           label={isActive === null ? "Cargando..." : isActive ? "Bot Activo" : "Bot Desactivado"}
+          style={{ color: '#555' }}
         />
       </FormGroup>
     </div>

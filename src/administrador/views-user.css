@@ -386,6 +386,22 @@
   padding: 20px 50px 20px 50px;
 }
 
+.switch-margin {
+  margin-left: 20px;
+}
+
+.switch-active .MuiSwitch-track{
+  background-color: #06d755 !important; /* Usa !important para sobreescribir el estilo por defecto */
+}
+
+.switch-active .MuiSwitch-thumb {
+  color: #fff !important; /* Cambia el color del thumb si es necesario */
+}
+
+.labelRed {
+  text-decoration-color: red  !important;
+}
+
 .message {
   position: relative;
   display: flex;
@@ -531,8 +547,4 @@
 
 .numero{
   width: 80%;
-}
-
-.icono{
-  right: 0;
 }

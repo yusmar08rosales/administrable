@@ -67,6 +67,7 @@ const UserView = () => {
     setSelectedDate(selectedDate);
     setIsDatePickerVisible(false);
     obtenerUsuarios(nameProduct, 1, searchTerm, selectedDate.toISOString());
+    console.log("Error línea 70");
   };
 
   //normalice el texto y no impora si tiene caracteres especiales
@@ -130,6 +131,7 @@ const UserView = () => {
   useEffect(() => {
     const actualizarUsuarios = async () => {
       obtenerUsuarios(nameProduct, 1, searchTerm);
+      console.log("Error línea 134");
     };
 
     const intervalo = setInterval(actualizarUsuarios, 3000);
@@ -174,9 +176,11 @@ const UserView = () => {
         setHayMasUsuarios(true);
       }
       console.log("carga..: ", nuevosUsuarios);
+      console.log("Error antes de línea 182");
       setUsuarios((prevUsuarios) =>
-        page === 1 ? nuevosUsuarios : [...prevUsuarios, ...nuevosUsuarios]
+        page === paginaActual ? nuevosUsuarios : [...prevUsuarios, ...nuevosUsuarios]
       );
+      console.log("Error línea 182");
     } catch (error) {
       console.error(error);
     }
@@ -279,6 +283,7 @@ const UserView = () => {
       const name_product = location.state.name_product;
       if (nameProduct !== name_product) {
         obtenerUsuarios(name_product, 1);
+        console.log("Error línea 285");
         setNameProduct(name_product);
         setLlamada(true);
       }
@@ -293,8 +298,10 @@ const UserView = () => {
     if (nameProduct) {
       setUsuarios([]);
       setPaginaActual(1);
+      console.log("Error línea 300");
       setHayMasUsuarios(true);
       obtenerUsuarios(nameProduct, 1, searchTerm);
+      console.log("Error línea 303");
     }
   }, [searchTerm]);
 
@@ -320,6 +327,7 @@ const UserView = () => {
           vistaChatboxRef.current.scrollHeight -
             vistaChatboxRef.current.clientHeight <=
           vistaChatboxRef.current.scrollTop + 1;
+          console.log("Error línea 329");
         if (estabaAlFinal) {
           vistaChatboxRef.current.scrollTop =
             vistaChatboxRef.current.scrollHeight;
@@ -337,6 +345,7 @@ const UserView = () => {
         // Verifica si el elemento observado está intersectando
         if (entries[0].isIntersecting && hayMasUsuarios) {
           setPaginaActual((prevPage) => prevPage + 1);
+          console.log("Error línea 347");
         }
       },
       { threshold: 1.0 }
@@ -359,6 +368,7 @@ const UserView = () => {
   useEffect(() => {
     if (paginaActual > 1 && nameProduct) {
       obtenerUsuarios(nameProduct, paginaActual, searchTerm);
+      console.log("Error línea 370");
     }
   }, [paginaActual, nameProduct, searchTerm]);
 
