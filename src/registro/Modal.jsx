@@ -17,6 +17,7 @@ const Modal = () => {
     const [values, setValues] = useState({
         user: '',
         password: '',
+        correo: '',
         role: ''
     })
     const [objRoles, setObjRoles] = useState([]);
@@ -31,7 +32,7 @@ const Modal = () => {
     const handleSubmit = (event) => {
         event.preventDefault();
 
-        if (values.user === '' || values.password === '' || values.role === '') {
+        if (values.user === '' || values.password === '' || values.correo === '' || values.role === '') {
             alert('Por favor, complete todos los campos del formulario');
             return;
         }
@@ -96,6 +97,18 @@ const Modal = () => {
                                 placeholder='Contraseña'
                                 value={values.password}
                                 onChange={e => setValues({ ...values, password: e.target.value })}
+                            />
+                            <TextField
+                                fullWidth
+                                autoFocus
+                                type='text'
+                                color='primary'
+                                margin='normal'
+                                variant='outlined'
+                                label='Correo'
+                                placeholder='Correo'
+                                value={values.correo}
+                                onChange={e => setValues({ ...values, correo: e.target.value })}
                             />
 
                             <FormControl fullWidth>
