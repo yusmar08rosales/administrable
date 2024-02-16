@@ -14,7 +14,7 @@ const ToggleBotButton = ({ userId, productName }) => {
   useEffect(() => {
 
      // Verifica si el producto no debe mostrar el switch
-     if (productName === "MARCUSS TRANSCRIPTOR" || productName === "MARCUSS PREMIUM") {
+     if (productName === "MARCUSS TRANSCRIPTOR" || productName === "MARCUSS PREMIUM" || productName === "BOT ASISTENTE PRUEBAS EDUARDO") {
       setIsProductAllowed(false);
       return; // Detiene la ejecución adicional si el producto no está permitido
     }

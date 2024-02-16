@@ -9,7 +9,6 @@ import Toolbar from "@mui/material/Toolbar";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 const Modal = () => {
-    const navigate = useNavigate();
     const [isFormSubmitted, setIsFormSubmitted] = useState(false);
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
